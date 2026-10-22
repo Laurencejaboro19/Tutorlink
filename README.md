@@ -37,7 +37,7 @@ npm run db:seed
 npm run dev          # http://localhost:3000
 ```
 
-The first account registered with `ADMIN_BOOTSTRAP_EMAIL` becomes a **super admin**. Email verification links are logged to the server console (and shown in the UI outside production) until `RESEND_API_KEY` is set.
+The first account registered with `ADMIN_BOOTSTRAP_EMAIL` becomes a **super admin**. Email verification links are logged to the server console (and shown in the UI outside production) until SMTP or Resend is configured (or while `EMAIL_DEBUG_LINKS=true`).
 
 ### Commands
 
@@ -53,7 +53,7 @@ The first account registered with `ADMIN_BOOTSTRAP_EMAIL` becomes a **super admi
 
 ## Environment variables
 
-See `.env.example`. Required in production: `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET` (≥32 random bytes), `FLUTTERWAVE_SECRET_KEY`, `FLUTTERWAVE_PUBLIC_KEY`, `FLUTTERWAVE_WEBHOOK_HASH`, `CRON_SECRET`, `ADMIN_BOOTSTRAP_EMAIL`. Optional: `RESEND_API_KEY` + `EMAIL_FROM` (email delivery), `PAYOUTS_ENABLED=true` (only after the go-live checklist), `FLUTTERWAVE_MODE=live`.
+See `.env.example`. Required in production: `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET` (≥32 random bytes), `FLUTTERWAVE_SECRET_KEY`, `FLUTTERWAVE_PUBLIC_KEY`, `FLUTTERWAVE_WEBHOOK_HASH`, `CRON_SECRET`, `ADMIN_BOOTSTRAP_EMAIL`. Optional: `SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS` (e.g. Gmail App Password) or `RESEND_API_KEY`, plus `EMAIL_FROM` (email delivery); `EMAIL_DEBUG_LINKS=true` shows links on screen during first setup only, `PAYOUTS_ENABLED=true` (only after the go-live checklist), `FLUTTERWAVE_MODE=live`.
 
 ## Payments: test mode vs live mode
 
