@@ -1,26 +1,155 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   TutorLink design tokens — derived from the brand mark:
+   blue #024EA2 (student figure / left pages), teal #01A09C (tutor figure / right pages)
+   ------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-brand-50: #eaf2fb;
+  --color-brand-100: #d2e3f6;
+  --color-brand-200: #a6c7ed;
+  --color-brand-300: #6fa3e0;
+  --color-brand-400: #3a7ccd;
+  --color-brand-500: #0f62b8;
+  --color-brand-600: #024ea2; /* primary */
+  --color-brand-700: #023f84;
+  --color-brand-800: #033268;
+  --color-brand-900: #04264e;
+
+  --color-teal-50: #e6f7f6;
+  --color-teal-100: #c6eeec;
+  --color-teal-200: #8fdcd9;
+  --color-teal-300: #52c6c2;
+  --color-teal-400: #1fb0ab;
+  --color-teal-500: #01a09c; /* secondary */
+  --color-teal-600: #018784;
+  --color-teal-700: #026e6b;
+  --color-teal-800: #045553;
+  --color-teal-900: #053f3d;
+
+  --color-ink-900: #0f1b2d;
+  --color-ink-700: #2a3a52;
+  --color-ink-500: #5b6b82;
+  --color-ink-400: #7d8a9e;
+  --color-ink-300: #aeb8c6;
+  --color-ink-200: #d7dde6;
+  --color-ink-100: #eceff4;
+  --color-ink-50: #f6f8fb;
+
+  --color-success-600: #15803d;
+  --color-success-100: #dcfce7;
+  --color-warning-600: #b45309;
+  --color-warning-100: #fef3c7;
+  --color-danger-600: #b91c1c;
+  --color-danger-100: #fee2e2;
+  --color-info-600: #024ea2;
+  --color-info-100: #eaf2fb;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --shadow-card: 0 1px 2px rgba(15, 27, 45, 0.06), 0 1px 3px rgba(15, 27, 45, 0.08);
+  --shadow-pop: 0 10px 30px -12px rgba(15, 27, 45, 0.25);
+}
+
 :root {
+  color-scheme: light;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: var(--color-ink-900);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Accessible focus ring everywhere */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Form controls */
+.tl-input {
+  @apply block w-full rounded-[var(--radius-md)] border border-ink-200 bg-white px-3.5 py-2.5 text-[15px] text-ink-900 placeholder:text-ink-400 shadow-none transition-colors;
+  min-height: 44px;
+}
+.tl-input:hover {
+  border-color: var(--color-ink-300);
+}
+.tl-input:focus {
+  border-color: var(--color-brand-500);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-brand-100);
+}
+.tl-input[aria-invalid="true"] {
+  border-color: var(--color-danger-600);
+}
+.tl-input:disabled {
+  @apply bg-ink-50 text-ink-400 cursor-not-allowed;
+}
+select.tl-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235b6b82' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.tl-label {
+  @apply block text-sm font-medium text-ink-700 mb-1.5;
+}
+.tl-help {
+  @apply mt-1.5 text-xs text-ink-500;
+}
+.tl-error {
+  @apply mt-1.5 text-xs text-danger-600;
+}
+
+/* Cards */
+.tl-card {
+  @apply rounded-[var(--radius-lg)] border border-ink-100 bg-white;
+  box-shadow: var(--shadow-card);
+}
+
+/* Table */
+.tl-table {
+  @apply w-full text-sm;
+}
+.tl-table th {
+  @apply text-left text-xs font-semibold uppercase tracking-wide text-ink-500 px-4 py-3 border-b border-ink-100 bg-ink-50;
+}
+.tl-table td {
+  @apply px-4 py-3 border-b border-ink-100 align-top;
+}
+.tl-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.tl-prose p + p {
+  margin-top: 0.75rem;
 }
