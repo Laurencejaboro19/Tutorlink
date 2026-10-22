@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, useActionState, useContext, useEffect, type ReactNode } from "react";
+import { createContext, useActionState, useContext, useEffect, useState, type ReactNode } from "react";
 import type { ActionResult } from "@/lib/result";
 import { Alert, Button } from "./ui";
 
@@ -39,7 +39,12 @@ export function ActionForm({
   resetOnSuccess?: boolean;
 }) {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(action, null);
+  const [formKey, setFormKey] = useState(0);
+  const [state, formAction, pending] = useActionState(async (prev: Result, fd: FormData) => {
+    const r = await action(prev, fd);
+    if (r?.ok && resetOnSuccess && !r.data?.redirectTo) setFormKey((k) => k + 1);
+    return r;
+  }, null);
 
   useEffect(() => {
     if (state?.ok) {
@@ -52,7 +57,7 @@ export function ActionForm({
 
   return (
     <FormCtx.Provider value={{ state, pending }}>
-      <form action={formAction} className={className} key={resetOnSuccess && state?.ok ? String(Date.now()) : undefined} noValidate>
+      <form action={formAction} className={className} key={formKey} noValidate>
         {state && !state.ok && (
           <Alert tone="danger" className="mb-4">
             {state.error}

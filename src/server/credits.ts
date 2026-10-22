@@ -120,7 +120,9 @@ export async function reverseCredit(tx: Tx, input: { entryId: string; adminId: s
       userId: entry.userId,
       amountNgn: fromKobo(-toKobo(entry.amountNgn)),
       type: "reversal",
-      status: "available",
+      // The original entry is already excluded from the balance (status = reversed); this row is the
+      // append-only audit record of the correction and must not be counted a second time.
+      status: "reversed",
       source: "admin",
       reason: input.reason,
       referenceType: "credit_entry",

@@ -23,7 +23,8 @@ export function parseForm<T extends z.ZodTypeAny>(schema: T, formData: FormData)
     if (k.startsWith("$")) continue;
     if (k.endsWith("[]")) {
       const key = k.slice(0, -2);
-      (raw[key] as unknown[] | undefined) ? (raw[key] as unknown[]).push(v) : (raw[key] = [v]);
+      if (Array.isArray(raw[key])) (raw[key] as unknown[]).push(v);
+      else raw[key] = [v];
     } else raw[k] = v;
   }
   const parsed = schema.safeParse(raw);

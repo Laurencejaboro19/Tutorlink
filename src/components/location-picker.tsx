@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Field, Select } from "./ui";
 import { FieldError } from "./action-form";
 
@@ -31,53 +31,66 @@ export function LocationPicker({
   const [lgaOpts, setLgaOpts] = useState<Opt[]>([]);
   const [cityOpts, setCityOpts] = useState<Opt[]>([]);
   const [loading, setLoading] = useState<"lga" | "city" | null>(null);
+  const req = useRef(0);
 
-  useEffect(() => {
-    if (!stateId) {
-      setLgaOpts([]);
-      return;
-    }
-    let alive = true;
+  const loadLgas = useCallback(async (sid: number) => {
+    const id = ++req.current;
+    if (!sid) return;
     setLoading("lga");
-    fetch(`/api/locations?state=${stateId}`)
-      .then((r) => r.json())
-      .then((rows: Opt[]) => {
-        if (!alive) return;
-        setLgaOpts(rows);
-        if (!rows.some((r) => r.id === lgaId)) setLgaId(0);
-      })
-      .finally(() => alive && setLoading(null));
-    return () => {
-      alive = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateId]);
-
-  useEffect(() => {
-    if (!lgaId) {
-      setCityOpts([]);
-      return;
+    try {
+      const rows: Opt[] = await fetch(`/api/locations?state=${sid}`).then((r) => r.json());
+      if (id === req.current) setLgaOpts(rows);
+    } finally {
+      if (id === req.current) setLoading(null);
     }
-    let alive = true;
+  }, []);
+
+  const loadCities = useCallback(async (lid: number) => {
+    const id = ++req.current;
+    if (!lid) return;
     setLoading("city");
-    fetch(`/api/locations?lga=${lgaId}`)
-      .then((r) => r.json())
-      .then((rows: Opt[]) => {
-        if (!alive) return;
-        setCityOpts(rows);
-        if (!rows.some((r) => r.id === cityId)) setCityId(0);
-      })
-      .finally(() => alive && setLoading(null));
+    try {
+      const rows: Opt[] = await fetch(`/api/locations?lga=${lid}`).then((r) => r.json());
+      if (id === req.current) setCityOpts(rows);
+    } finally {
+      if (id === req.current) setLoading(null);
+    }
+  }, []);
+
+  // Hydrate option lists for pre-selected values (edit forms).
+  useEffect(() => {
+    const sid = initial?.stateId ?? 0;
+    const lid = initial?.lgaId ?? 0;
+    if (!sid) return;
+    let cancelled = false;
+    const t = setTimeout(() => {
+      if (cancelled) return;
+      void loadLgas(sid).then(() => (lid && !cancelled ? loadCities(lid) : undefined));
+    }, 0);
     return () => {
-      alive = false;
+      cancelled = true;
+      clearTimeout(t);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lgaId]);
+  }, [initial?.stateId, initial?.lgaId, loadLgas, loadCities]);
 
   return (
     <div className="grid gap-4 sm:grid-cols-3">
       <Field label={labels.stateId} name={names.stateId} required={required}>
-        <Select id={names.stateId} name={names.stateId} value={stateId || ""} onChange={(e) => setStateId(Number(e.target.value))} required={required}>
+        <Select
+          id={names.stateId}
+          name={names.stateId}
+          value={stateId || ""}
+          onChange={(e) => {
+            const v = Number(e.target.value);
+            setStateId(v);
+            setLgaId(0);
+            setCityId(0);
+            setLgaOpts([]);
+            setCityOpts([]);
+            void loadLgas(v);
+          }}
+          required={required}
+        >
           <option value="">Select state</option>
           {states.map((s) => (
             <option key={s.id} value={s.id}>
@@ -88,7 +101,20 @@ export function LocationPicker({
         <FieldError name={names.stateId} />
       </Field>
       <Field label={labels.lgaId} name={names.lgaId} required={required}>
-        <Select id={names.lgaId} name={names.lgaId} value={lgaId || ""} onChange={(e) => setLgaId(Number(e.target.value))} disabled={!stateId || loading === "lga"} required={required}>
+        <Select
+          id={names.lgaId}
+          name={names.lgaId}
+          value={lgaId || ""}
+          onChange={(e) => {
+            const v = Number(e.target.value);
+            setLgaId(v);
+            setCityId(0);
+            setCityOpts([]);
+            void loadCities(v);
+          }}
+          disabled={!stateId || loading === "lga"}
+          required={required}
+        >
           <option value="">{loading === "lga" ? "Loading…" : "Select LGA"}</option>
           {lgaOpts.map((s) => (
             <option key={s.id} value={s.id}>

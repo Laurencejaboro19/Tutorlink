@@ -4,7 +4,8 @@ import { ActionForm, FieldError } from "@/components/action-form";
 import { LocationPicker } from "@/components/location-picker";
 import { Card, CardHeader, Field, Input } from "@/components/ui";
 import { changePasswordAction, deleteAccountAction } from "@/server/auth-actions";
-import { setLocationAction, setRoleAction, updateContactAction } from "@/server/account-actions";
+import { updateContactAction } from "@/server/account-actions";
+import { setLocationAction, setRoleAction } from "@/server/onboarding-actions";
 
 export function AccountForms({
   states,

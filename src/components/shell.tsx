@@ -17,6 +17,7 @@ export const studentNav: NavItem[] = [
   { href: "/challenges", label: "Daily challenges" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/dashboard/credits", label: "Credits & rewards" },
+  { href: "/dashboard/payments", label: "Payments" },
   { href: "/dashboard/referrals", label: "Refer & earn" },
 ];
 
@@ -29,7 +30,7 @@ export const tutorNav: NavItem[] = [
   { href: "/tutor/earnings", label: "Earnings" },
   { href: "/tutor/subscription", label: "Subscription" },
   { href: "/tutor/challenges", label: "My challenges" },
-  { href: "/dashboard/referrals", label: "Refer & earn" },
+  { href: "/tutor/referrals", label: "Refer & earn" },
 ];
 
 export const adminNav: NavItem[] = [

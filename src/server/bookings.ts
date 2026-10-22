@@ -130,7 +130,9 @@ export async function createBooking(input: {
       return { booking, payment };
     });
   } catch (e) {
-    if (e && typeof e === "object" && "code" in e && (e as { code: string }).code === "23P01") {
+    // drizzle ≥0.44 wraps driver errors in DrizzleQueryError; the pg code lives on `cause`.
+    const pgCode = (err: unknown): string | undefined => (err && typeof err === "object" && "code" in err ? String((err as { code: unknown }).code) : undefined);
+    if (pgCode(e) === "23P01" || pgCode((e as { cause?: unknown })?.cause) === "23P01") {
       throw new DomainError("That slot was just taken. Please choose another time.");
     }
     throw e;

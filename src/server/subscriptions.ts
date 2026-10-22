@@ -24,7 +24,8 @@ export async function startPaidSubscription(tutorId: string, planCode: Exclude<P
   if (!profile) throw new DomainError("Tutor profile not found.");
   const current = await getActiveSubscription(tutorId);
   if (current?.planCode === planCode && current.source === "paid" && !current.cancelAtPeriodEnd) {
-    throw new DomainError(`You are already on ${plan.name}. Renewal opens in the last 5 days of your period.`);
+    const daysLeft = (current.endsAt.getTime() - Date.now()) / 86_400_000;
+    if (daysLeft > 5) throw new DomainError(`You are already on ${plan.name}. Renewal opens in the last 5 days of your period.`);
   }
   return db.transaction(async (tx) => {
     const now = new Date();

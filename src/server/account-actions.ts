@@ -8,7 +8,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { fail, succeed, type ActionResult } from "@/lib/result";
 import { parseForm, phoneSchema } from "@/lib/validation";
 
-export { setLocationAction, setRoleAction } from "./onboarding-actions";
 
 type R = ActionResult<{ redirectTo?: string }> | null;
 

@@ -24,9 +24,10 @@ export function NavLink({ href, children, exact, className }: { href: string; ch
 }
 
 export function MobileNav({ items, signedIn, logout }: { items: { href: string; label: string }[]; signedIn: boolean; logout: () => Promise<void> }) {
-  const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  const open = openPath === pathname; // auto-closes when the route changes
+  const setOpen = (v: boolean | ((o: boolean) => boolean)) => setOpenPath((cur) => (typeof v === "function" ? v(cur === pathname) : v) ? pathname : null);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
